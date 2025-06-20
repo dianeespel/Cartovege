@@ -1,0 +1,8 @@
+
+Sur Qgis, 
+1) Ouvrir le fichier des centroides des quadrats (.shp)
+2) Corriger à la main les positionnements des centroïdes  sur une image satellite de très haute résolution/ une image aérienne :
+- les quadrats doivent être dans des zones homogènes
+- les quadrats d'une même classe doivent tomber dans des zones de même "couleur", texture.
+
+Une fois,les centroïdes corrigés, enregistrer le nouveau fichier centroide dans un fichier "Quadrat_..._ALL_..._Samples_Centroids_corrected_ESPG32735.shp" 
