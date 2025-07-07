@@ -1,0 +1,44 @@
+name: my_env
+channels:
+  - conda-forge
+  - bioconda
+  - r
+  - nodefaults
+dependencies:
+  - r-base
+  - r-ade4
+  - r-caret
+  - r-corrplot
+  - r-data.table
+  - r-dplyr
+  - r-e1071
+  - r-factoextra
+  - r-FactoMineR
+  - r-fs 
+  - r-ggplot2
+  - r-igraph
+  - r-nngeo
+  - r-plyr # useless?
+  - r-polylabelr
+  - r-pROC
+  - r-purrr
+  - r-randomForest
+  - r-raster  # useless?
+  - r-rcolorbrewer
+  - r-Rcpp
+  - r-readr # useless? read_csv()
+  - r-reshape2
+  - r-rgdal # useless
+  - r-rgeos # useless
+  - r-rlang
+  - r-rmapshaper
+  - r-rminer
+  - r-sf
+  - r-sp
+  - r-spatialEco
+  - r-stats
+  - r-stringr
+  - r-terra
+  - r-tidyr
+  - r-viridis
+  

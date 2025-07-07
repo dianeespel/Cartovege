@@ -1,0 +1,17 @@
+name: GLCMTextures_env
+channels:
+  - conda-forge
+  - bioconda
+  - r
+  - nodefaults
+dependencies:
+  - r-base
+  - r-terra>=1.8.5
+  - r-glcm
+  - r-raster
+  - r-viridis
+  - r-Rcpp
+  - r-raster
+
+  
+

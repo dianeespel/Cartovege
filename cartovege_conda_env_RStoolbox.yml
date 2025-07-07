@@ -1,0 +1,22 @@
+name: RStoolbox_env
+channels:
+  - conda-forge
+  - bioconda
+  - r
+  - nodefaults
+dependencies:
+  - r-base
+  - r-caret
+  - r-dplyr
+  - r-exactextractr
+  - r-ggplot2
+  - r-lifecycle
+  - r-magrittr
+  - r-reshape2
+  - r-sf
+  - r-terra>=1.8.5
+  - r-tidyr
+  - r-xml
+  - r-Rcpp
+  - r-rstoolbox
+ 

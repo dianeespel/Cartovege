@@ -111,9 +111,7 @@ Res2="30m" # spatial resolution of DEM
 
 # Base local path (customize to your local environment)
 localHOME=paste0("/home/genouest/cnrs_umr6553/despel/CARTOVEGE/")
-localscratch=paste0("/scratch/despel/CARTOVEGE/")
 #localHOME = paste0("your_local_path/")
-#localscatch = paste0("your_second_local_path/")
 
 # path where to open vector data
 open_mask_path=paste0(localHOME,"data/vector/mask")
@@ -122,7 +120,7 @@ open_mask_path=paste0(localHOME,"data/vector/mask")
 open_precut_raster_path=paste0(localHOME,"data/raster/Precut_image")
 
 # path where to save your results
-save_cut_raster_path=paste0(localscratch,"data/raster/Cut_image")
+save_cut_raster_path=paste0(localHOME,"data/raster/Cut_image")
 
 
 # Load rasters and mask  ----------------------------------------------------------
@@ -134,7 +132,6 @@ print(paste0("Processing imagery for month: ", Month1))
 # Load ROI polygon shapefile
 print("Loading island ROI shapefile")
 ROI_mask <- st_read(dsn = paste0(open_mask_path, "/", District, "_", Island, "_POLY_", Year1, "_EPSG32739.shp"))
-ROI_mask <- as_Spatial(ROI_mask)
 
 # Load raster data
 print("Loading MS raster")

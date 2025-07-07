@@ -22,6 +22,7 @@ localscratch <- "/scratch/despel/CARTOVEGE/"
 dirs_localHOME <- c(
   file.path(localHOME, "data/samples"),
   file.path(localHOME, "data/raster/Precut_image"),
+  file.path(localHOME, "data/raster/Cut_image"),
   file.path(localHOME, "data/vector/Plots/PrimaryTypo"),
   file.path(localHOME, "data/vector/Observed_map/PrimaryTypo"),
   file.path(localHOME, "data/vector/mask")

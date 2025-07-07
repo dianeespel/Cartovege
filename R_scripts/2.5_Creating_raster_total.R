@@ -34,14 +34,16 @@ Res2="30m" # spatial resolution of DEM
 # Set working directory -------------------------------------------------------------
 
 # Base local path (customize to your local environment)
-#localscratch = paste0("your_local_path/")
+localHOME=paste0("/home/genouest/cnrs_umr6553/despel/CARTOVEGE/")
 localscratch=paste0("/scratch/despel/CARTOVEGE/")
+#localscratch = paste0("your_local_path/")
 
 # Path to open input raster 
-open_cut_raster_path=paste0(localscratch,"data/raster/Cut_image")
+open_cut_raster_path=paste0(localHOME,"data/raster/Cut_image")
 
 # Path to save raster stack
 save_cut_raster_path=paste0(localscratch,"data/raster/Cut_image")
+
 
 # Load and prepare rasters -------------------------------------------------------------
 

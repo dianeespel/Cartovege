@@ -32,14 +32,14 @@ Res1 = "50cm"  # spatial resolution of multispectral imagery
 # Set working directory -------------------------------------------------------------
 
 # Base local path (customize to your local environment)
-#localscratch = paste0("your_local_path/")
-localscratch=paste0("/scratch/despel/CARTOVEGE/")
+#localHOME = paste0("your_local_path/")
+localHOME=paste0("/home/genouest/cnrs_umr6553/despel/CARTOVEGE/")
 
 # Path to open input index raster 
-open_cut_raster_path=paste0(localscratch,"data/raster/Cut_image")
+open_cut_raster_path=paste0(localHOME,"data/raster/Cut_image")
 
 # Path to save texture rasters
-save_cut_raster_path=paste0(localscratch,"data/raster/Cut_image")
+save_cut_raster_path=paste0(localHOME,"data/raster/Cut_image")
 
 
 # Load spectral index ------------------------------------------------------------

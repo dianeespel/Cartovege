@@ -37,6 +37,7 @@ localscratch=paste0("/scratch/despel/CARTOVEGE/")
 
 # Path to open  input raster stack
 open_cut_raster_path=paste0(localscratch,"data/raster/Cut_image")
+
 # Path to open  vector plots
 open_plots_path=paste0(localHOME,"data/vector/Plots/PrimaryTypo")
 

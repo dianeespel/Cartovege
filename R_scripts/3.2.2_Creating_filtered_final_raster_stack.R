@@ -36,6 +36,7 @@ Res2 = "30m"  # spatial resolution of DEM
 # Set working directory -------------------------------------------------------------
 
 # Base local path (customize to your local environment)
+localHOME=paste0("/home/genouest/cnrs_umr6553/despel/CARTOVEGE/")
 localscratch=paste0("/scratch/despel/CARTOVEGE/")
 #localscratch = paste0("your_local_path/")
 
@@ -43,7 +44,8 @@ localscratch=paste0("/scratch/despel/CARTOVEGE/")
 open_learning_primary_path=paste0(localscratch,"data/Learning_data/PrimaryTypo")
 
 # Path to open input rasters layers or stack
-open_cut_raster_path=paste0(localscratch,"data/raster/Cut_image")
+open_cut_raster_path_scratch=paste0(localscratch,"data/raster/Cut_image")
+open_cut_raster_path_HOME=paste0(localHOME,"data/raster/Cut_image")
 
 # Path to save the final raster stack
 save_cut_raster_path=paste0(localscratch,"data/raster/Cut_image")
@@ -68,7 +70,7 @@ cat("Selected variables:", paste(list_variables, collapse=", "), "\n")
 # Stacking Loop over years -------------------------------------------------------------
 
 # Identify available years for Satellite1 rasters based on file names
-all_satellite1_files <- list.files(open_cut_raster_path, pattern = paste0(District, "_", Island, "_", Satellite1, "_\\d{4}_.+_", Res1, "_.*\\.TIF$"))
+all_satellite1_files <- list.files(open_cut_raster_path_HOME, pattern = paste0(District, "_", Island, "_", Satellite1, "_\\d{4}_.+_", Res1, "_.*\\.TIF$"))
 available_satellite1_years <- sort(unique(str_extract(all_satellite1_files, "\\d{4}")))
 available_satellite1_years <- available_satellite1_years[!is.na(available_satellite1_years)]
 cat("Detected years:", paste(available_satellite1_years, collapse = ", "), "\n")
@@ -85,7 +87,7 @@ for (Year in available_satellite1_years) {
     cat("Processing Year:", Year, "\n")
     
     # Load full raster stack for this year and assign layer names
-    raster_total <- rast(paste0(open_cut_raster_path, "/", District, "_", Island, "_", Satellite1, "_Total_raster_stack_", Year, "_", Res1, "_cut.TIF"))
+    raster_total <- rast(paste0(open_cut_raster_path_scratch, "/", District, "_", Island, "_", Satellite1, "_Total_raster_stack_", Year, "_", Res1, "_cut.TIF"))
     expected_names <- c("R", "G", "B", "NIR", "NDVI", "GRVI", "VARI", "GCCI", "Brightness", "BSI", "NDWI", "Dtm", "Slope")
     
     # Only rename layers if the number of layers matches
@@ -115,11 +117,11 @@ for (Year in available_satellite1_years) {
       
       # Search for the raster file in Satellite1 (main)
       pattern_year  <- paste0(District, "_", Island, "_", Satellite1, "_", Year, "_", Res1, "_", var, "_cut\\.TIF$")
-      file_year     <- list.files(open_cut_raster_path, pattern = pattern_year, full.names = TRUE)
+      file_year     <- list.files(open_cut_raster_path_HOME, pattern = pattern_year, full.names = TRUE)
       
       # If not found, search in Satellite2 (fallback)
       pattern_year2 <- paste0(District, "_", Island, "_", Satellite2, "_", Year2, "_", Res2, "_", var, "_cut\\.TIF$")
-      file_year2    <- list.files(open_cut_raster_path, pattern = pattern_year2, full.names = TRUE)
+      file_year2    <- list.files(open_cut_raster_path_HOME, pattern = pattern_year2, full.names = TRUE)
       
       # If found in Satellite1
       if (length(file_year) > 0) {
