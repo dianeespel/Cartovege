@@ -114,7 +114,8 @@ for (l in seq_len(maxTypoLevel)) {
      
       
       # Prediction on raster stack
-      raster_pred <- terra::predict(raster_final, FinalModel)
+      raster_pred_crisp <- terra::predict(raster_final, FinalModel) # default : type ="response" crisp classification
+      raster_pred_fuzzy <- terra::predict(raster_final, FinalModel,type="prob") # fuzzy classification
       
       # Define specific folder for spatial predictions
       MapFolder=paste0(save_predictions_path,"/","Hab_L",l)
@@ -122,35 +123,39 @@ for (l in seq_len(maxTypoLevel)) {
     
       # Save spatial predictions (.tif)
       NOMtiff=paste0(MapFolder,"/","Final_map_RF_",type_model,"_model_", District, "_", Island, "_", Satellite1, "_", Year, "_", Res1,"_level_", l, ".TIF")
-      writeRaster(raster_pred, NOMtiff, overwrite = TRUE)
+      writeRaster(raster_pred_crisp, NOMtiff, overwrite = TRUE)
+      
+      NOMtiff2=paste0(MapFolder,"/","Final_map_RF_",type_model,"_model_fuzzy_", District, "_", Island, "_", Satellite1, "_", Year,"_", Res1, "_level_", l, ".TIF")
+      writeRaster(raster_pred_fuzzy, NOMtiff2, overwrite = TRUE)
+      rm(raster_pred_fuzzy) # free memory
       
       # Save spatial predictions (.png)
       NOMpng=paste0(MapFolder,"/","Final_map_RF_",type_model,"_model_", District, "_", Island, "_", Satellite1, "_", Year,"_", Res1, "_level_", l, ".png")
       png(file = NOMpng, width = 1000, height = 1000)
-      plot(raster_pred, col = viridis(length(unique(values(raster_pred)))), 
+      plot(raster_pred_crisp, col = viridis(length(unique(values(raster_pred_crisp)))), 
            main = paste0("Carte finale des habitats niveau ", l), 
            axes = FALSE, cex.lab = 1.5)
       dev.off()
       
       # Apply modal filter with a square window of size (2*window_size + 1)
-      resolution <- res(raster_pred) # Compute resolution of the raster
+      resolution <- res(raster_pred_crisp) # Compute resolution of the raster
       radius <- 10 # Define the radius of the smoothing window (in map units)
       window_size <- radius / resolution # Calculate window size in pixels
       window_size <- ceiling(window_size) # Round up to ensure window fully covers the radius
       window_size <- ifelse(window_size %% 2 == 0, window_size + 1, window_size) # Ensure window size is odd (required for a centered focal filter)
-      filtered_raster_pred <- focal(raster_pred, 
+      filtered_raster_pred_crisp<- focal(raster_pred_crisp, 
                                     w = matrix(1, nrow = window_size[1]*2+1, 
                                                ncol = window_size[2]*2+1), fun = modal) # apply smooth filter
-      rm(raster_pred) # free memory
+      rm(raster_pred_crisp) # free memory
       
       # Save smooth map (.tif)
-      NOMtiff2=paste0(MapFolder,"/","Smoothed_final_map_RF_",type_model,"_model_", District, "_", Island, "_", Satellite1, "_", Year,"_", Res, "_level_", l, ".TIF")
-      writeRaster(filtered_raster_pred, NOMtiff2, overwrite = TRUE)
+      NOMtiff3=paste0(MapFolder,"/","Smoothed_final_map_RF_",type_model,"_model_", District, "_", Island, "_", Satellite1, "_", Year,"_", Res, "_level_", l, ".TIF")
+      writeRaster(filtered_raster_pred_crisp, NOMtiff3, overwrite = TRUE)
       
       # Convert raster to vector
-      vector_map <- terra::as.polygons(filtered_raster_pred, fun = function(x) { x > 0 })
+      vector_map <- terra::as.polygons(filtered_raster_pred_crisp, fun = function(x) { x > 0 })
       vector_layer <- terra::project(vector_map, "EPSG:32739")
-      rm(filtered_raster_pred)
+      rm(filtered_raster_pred_crisp)
       
       # Simplify geometry
       vector_layer_sf <- st_as_sf(vector_layer)
