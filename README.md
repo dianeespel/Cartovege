@@ -19,4 +19,10 @@ It uses a **Random Forest** supervised classification framework and supports hie
 - Fully automated and reproducible workflow
 - Adaptable to various datasets, spatial resolutions, and ecological contexts
 - Transparent script-based implementation (no GUI required)
-- Open-source (MIT License) with RMarkdown tutorials
+- RMarkdown tutorials
+
+
+This pipeline is open source but protected by a MIT Licence
+Please cite this pipeline using the following DOI: 10.5281/zenodo.15827742
+
+
