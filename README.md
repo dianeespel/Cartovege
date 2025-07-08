@@ -25,6 +25,6 @@ It uses a **Random Forest** supervised classification framework and supports hie
 
 This pipeline is open source but protected by a MIT Licence.
 
-Please cite this pipeline using the following DOI: 10.5281/zenodo.15827742
+Please cite this pipeline using the following DOI: https://doi.org/10.5281/zenodo.15827741
 
 
