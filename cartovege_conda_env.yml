@@ -27,6 +27,7 @@ dependencies:
   - r-rcolorbrewer
   - r-Rcpp
   - r-readr # useless? read_csv()
+  - r-resample	
   - r-reshape2
   - r-rgdal # useless
   - r-rgeos # useless
@@ -36,7 +37,7 @@ dependencies:
   - r-sf
   - r-sp
   - r-spatialEco
-  - r-stats
+  #- r-stats # base R
   - r-stringr
   - r-terra
   - r-tidyr
