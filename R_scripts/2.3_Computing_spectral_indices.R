@@ -47,43 +47,32 @@ SpectralIndices<- function(archipelago,island,red,green,blue,nir,nameSat,year,mo
   bsi_raster=(green+nir)/(green-nir) #  Bare soil index (Lillo-Saavedra et al., 2018)
   ndwi_raster=(green-nir)/(green+nir) # Normalized Difference Water Index  (Gao, 1996)
   
-  
   # Recording path for spectral indices
-  path_ndvi <- paste(archipelago,"_",island,"_",nameSat, "_",year,"_",month,"_",resImage, "_ndvi_cut.TIF", sep = "") 
-  path_grvi <- paste(archipelago,"_",island,"_",nameSat, "_",year, "_",month,"_",resImage, "_grvi_cut.TIF", sep = "") 
-  path_vari <- paste(archipelago,"_",island,"_",nameSat, "_",year,"_", month,"_",resImage, "_vari_cut.TIF", sep = "")
-  path_gcci <- paste(archipelago,"_",island,"_",nameSat, "_",year,"_", month,"_",resImage, "_gcci_cut.TIF", sep = "")
-  path_brightness <- paste(archipelago,"_",island,"_",nameSat, "_",year,"_", month, "_",resImage,"_brightness_cut.TIF", sep = "") 
-  path_bsi <- paste(archipelago,"_",island,"_",nameSat, "_",year,"_", month,"_",resImage, "_bsi_cut.TIF", sep = "") 
-  path_ndwi <- paste(archipelago,"_",island,"_",nameSat, "_",year, "_",month,"_",resImage,"_ndwi_cut.TIF", sep = "") 
-   
+  make_path <- function(index) {
+    paste0(archipelago, "_", island, "_", nameSat, "_", year, "_", month, "_", resImage, "_", index, "_cut.TIF")
+  }
   
   # Recording indices
+  writeRaster(ndvi_raster, filename = make_path("ndvi"), overwrite = TRUE)
+  writeRaster(grvi_raster, filename = make_path("grvi"), overwrite = TRUE)
+  writeRaster(vari_raster, filename = make_path("vari"), overwrite = TRUE)
+  writeRaster(gcci_raster, filename = make_path("gcci"), overwrite = TRUE)
+  writeRaster(brightness_raster, filename = make_path("brightness"), overwrite = TRUE)
+  writeRaster(bsi_raster, filename = make_path("bsi"), overwrite = TRUE)
+  writeRaster(ndwi_raster, filename = make_path("ndwi"), overwrite = TRUE)
   
-  writeRaster(ndvi_raster, filename = path_ndvi, overwrite = TRUE)
-  return(ndvi_raster)
-  
-  writeRaster(grvi_raster, filename = path_grvi, overwrite = TRUE)
-  return(grvi_raster)
-  
-  writeRaster(vari_raster, filename = path_vari, overwrite = TRUE)
-  return(vari_raster)
-  
-  writeRaster(gcci_raster, filename = path_gcci, overwrite = TRUE)
-  return(gcci_raster)
-  
-  writeRaster(brightness_raster, filename = path_brightness, overwrite = TRUE)
-  return(brightness_raster)
-  
-  writeRaster(bsi_raster, filename = path_bsi, overwrite = TRUE)
-  return(bsi_raster)
-  
-  writeRaster(ndwi_raster, filename = path_ndwi, overwrite = TRUE)
-  return(ndwi_raster)
-  
+  # Return all created rasters
+  return(list(
+    NDVI = ndvi_raster,
+    GRVI = grvi_raster,
+    VARI = vari_raster,
+    GCCI = gcci_raster,
+    Brightness = brightness_raster,
+    BSI = bsi_raster,
+    NDWI = ndwi_raster
+  ))
   
 }
-
 
 
 # Set working directory -------------------------------------------------------------

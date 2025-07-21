@@ -61,7 +61,7 @@ NDVI <- rast(paste0(open_cut_raster_path,"/",District,"_",Island,"_",Satellite1,
 GRVI <- rast(paste0(open_cut_raster_path,"/",District,"_",Island,"_",Satellite1, "_",Year1,"_",Month1,"_",Res1, "_grvi_cut.TIF"))
 VARI <- rast(paste0(open_cut_raster_path,"/",District,"_",Island,"_",Satellite1, "_",Year1,"_",Month1,"_",Res1, "_vari_cut.TIF"))
 GCCI <- rast(paste0(open_cut_raster_path,"/",District,"_",Island,"_",Satellite1, "_",Year1,"_",Month1,"_",Res1, "_gcci_cut.TIF"))
-Brightness <- rast(paste0(District,"_",Island,"_",Satellite1, "_",Year1,"_",Month1,"_",Res1, "_brightness_cut.TIF"))
+Brightness <- rast(paste0(open_cut_raster_path,"/",District,"_",Island,"_",Satellite1, "_",Year1,"_",Month1,"_",Res1, "_brightness_cut.TIF"))
 BSI <- rast(paste0(open_cut_raster_path,"/",District,"_",Island,"_",Satellite1, "_",Year1,"_",Month1,"_",Res1, "_bsi_cut.TIF"))
 NDWI <- rast(paste0(open_cut_raster_path,"/",District,"_",Island,"_",Satellite1, "_",Year1,"_",Month1,"_",Res1, "_ndwi_cut.TIF"))
 
@@ -107,9 +107,9 @@ print(raster_MS)
 
 #  Stack all indices into raster_indices 
 print("Stacking spectral indices")
-raster_indices=c(NDVI,GRVI,vari,gcci,brightness,bsi,ndwi) # stack indices
+raster_indices=c(NDVI,GRVI,VARI,GCCI,Brightness,BSI,NDWI) # stack indices
 names(raster_indices) = c("NDVI","GRVI","VARI","GCCI","Brightness","BSI","NDWI") # rename layers in the raster stack
-rm(NDVI,GRVI,vari,gcci,brightness,bsi,ndwi) # remove useless layers
+rm(NDVI,GRVI,VARI,GCCI,Brightness,BSI,NDWI) # remove useless layers
 writeRaster(raster_indices,paste0(save_cut_raster_path,"/",District,"_",Island,"_",Satellite1,"_",Year1,"_",Month1,"_",Res1,"_Indices_cut.TIF"),overwrite=T)
 print(raster_indices)
 
