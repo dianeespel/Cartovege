@@ -350,14 +350,24 @@ for (l in seq(1:maxTypoLevel)) {
   }  # End of cross-testing iterations loop (i loop)
   
   
-  # Stack all iterations parameters ------------------------------------
+  # Stack all iterations parameters, metrics and averaged metrics ------------------------------------
   
   print("Saving summary of all model parameters and performance metrics...")
-  
   ParamSummary = cbind(iteration_list, ntree_list, mtry_list, nodes_list,ValPerformance_list, oob_list,overall_accuracy_list,kappa_list,auc_list)
   names(ParamSummary)=c("niter","ntree","mtry","nodes","ValPerformance","OOB_rate","Overall_accuracy","Kappa_coefficient","AUC")
+  
+  # Compute averaged metrics
+  metrics <- c( "OOB_rate", "Overall_accuracy", "Kappa_coefficient", "AUC") # Define metric columns
+  mean_row <- colMeans(ParamSummary[, metrics], na.rm = TRUE) # Compute mean by column
+  se_row <- sapply(ParamSummary[, metrics], function(x) sd(x, na.rm = TRUE) / sqrt(length(na.omit(x)))) # Compute standard error (SE) by column
+  row_names <- names(ParamSummary)
+  empty_row <- setNames(as.list(rep(NA, length(row_names))), row_names) # Create empty rows matching structure
+  mean_line <- empty_row; mean_line[metrics] <- mean_row; mean_line$niter <- "mean" # Fill in values for mean  rows
+  se_line   <- empty_row; se_line[metrics]   <- se_row;   se_line$niter <- "SE" # Fill in values for SE rows
+  ParamSummary_extended <- rbind(ParamSummary, mean_line, se_line) # Bind rows to original table
+  
   FILE5=paste0(LevelFolder,"/","AllParamMetrics_tuned_RF_",type_model,"_model_",District,"_",Island,"_",Satellite1,"_level_",l,".csv")
-  write.table(ParamSummary,file=FILE5,sep=";",dec=".",row.names = FALSE)
+  write.table(ParamSummary_extended,file=FILE5,sep=";",dec=".",row.names = FALSE)
   
   
 }  # End of typology level loop

@@ -119,9 +119,6 @@ for (source in source_list){
   indices_doublons <- which(duplicated(poly_points$N_obs) | duplicated(poly_points$N_obs, fromLast = TRUE))
   print(indices_doublons)
   
-  # Save centroid coordinates as CSV
-  FILE3 = paste0(save_plots_path, "/Quadrats_", District, "_", Island, "_ALL_", source, "_SAMPLES_Centroids_EPSG32739.csv")
-  write.table(poly_points, file = FILE3, sep = ";", dec = ".", row.names = FALSE)
   
   # Construct quadrat polygons (5 points: NW to NW clockwise to close the shape)
   quadrats <- cbind(poly_points$xMinus, poly_points$yPlus,   # NW
@@ -142,20 +139,22 @@ for (source in source_list){
     proj4string = CRS("+init=EPSG:32739")         # Define projection
   )
   
-  plot(polysHabitat)  # Plot polygons for visual check
   
   # Create SpatialPolygonsDataFrame to store attributes
   # This object links each quadrat polygon with its corresponding metadata (attributes)
   polys.df <- SpatialPolygonsDataFrame(polysHabitat,  # The SpatialPolygons object containing geometry
-                                       data.frame(ID = ID, row.names = ID) # Create a minimal data.frame with IDs as row names
-                                       ) 
+                                       data.frame(N_obs = ID, row.names = ID) # Create a minimal data.frame with IDs as row names
+  ) 
   polys.df$xcoord_m = poly_points$xcoord_m # Add additional attribute fields to the SpatialPolygonsDataFrame
   polys.df$ycoord_m = poly_points$ycoord_m
   polys.df$Longitude = poly_points$Longitude
   polys.df$Latitude = poly_points$Latitude
   polys.df$Date = poly_points$Date
+  polys.df$Protocole = poly_points$Protocole
   polys.df$Source = poly_points$Source
   polys.df$Surface = poly_points$Surface
+  polys.df$Longueur_m = poly_points$Longueur_m
+  polys.df$Largeur_m = poly_points$Largeur_m
   polys.df$Hab_L1 = poly_points$Hab_L1
   polys.df$Hab_L2 = poly_points$Hab_L2
   polys.df$Hab_L3 = poly_points$Hab_L3
@@ -164,12 +163,16 @@ for (source in source_list){
   # Save the final shapefiles  -------------------
   
   # Export polygons as shapefile
-  polys.sf <- st_as_sf(polys.df)
+  polys.sf <- st_as_sf(polys.df) # Convert SpatialPolygonsDataFrame to sf object for modern spatial operations and writing
   st_write(polys.sf, paste0(save_plots_path, "/Quadrats_", District, "_", Island, "_ALL_", source, "_SAMPLES_Polygons_EPSG32739.shp"), driver = "ESRI Shapefile", append = FALSE)
   
-  # Convert sampling centroids to spatial points shapefile
-  pts.in.polys <- st_as_sf(poly_points, coords = c("xcoord_m", "ycoord_m"), crs = 32739)
+  # Get centroids from polygons
+  pts.in.polys <- sf::st_centroid(polys.sf)
   st_write(pts.in.polys, paste0(save_plots_path, "/Quadrats_", District, "_", Island, "_ALL_", source, "_SAMPLES_Centroids_EPSG32739.shp"), driver = "ESRI Shapefile", append = FALSE)
+  
+  # Save centroid coordinates as CSV
+  FILE3 = paste0(save_plots_path, "/Quadrats_", District, "_", Island, "_ALL_", source, "_SAMPLES_Centroids_EPSG32739.csv")
+  write.table(pts.in.polys, file = FILE3, sep = ";", dec = ".", row.names = FALSE)
   
 } # end of source loop
 

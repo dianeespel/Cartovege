@@ -97,7 +97,7 @@ field_samples <- st_read(FILE2)
 
 # Check for duplicate IDs in field samples and observed map
 print("There should be no duplicate IDs")
-colnames(field_samples)[colnames(field_samples) == "ID"] <- "id"  # Rename ID column for consistency
+colnames(field_samples)[colnames(field_samples) == "N_obs"] <- "id"  # Rename ID column for consistency
 id_doublons_field <- which(duplicated(field_samples$id) | duplicated(field_samples$id, fromLast = TRUE))
 print(id_doublons_field)  # Print any duplicate IDs found in field samples
 id_doublons_map <- which(duplicated(observed_map$id) | duplicated(observed_map$id, fromLast = TRUE))

@@ -18,7 +18,7 @@ graphics.off()   # Close all graphics devices (if any plots are open)
 library(sp)       # For spatial data structures (legacy)
 library(sf)       # For modern simple features spatial data handling
 library(terra)    # For raster and vector data manipulation (newer alternative to raster)
-
+library(dplyr)    # For bind_rows() function
 
 # Create fucntions  ---------------------------------------------------
 
@@ -55,9 +55,9 @@ save_plots_path=paste0(localHOME,"data/vector/Plots/PrimaryTypo")
 # Read shapefiles ----------------------------------------------------
 
 # Define full paths to the shapefiles to be loaded
-FILE1 <- paste0(open_ObsMap_path, paste0("Corrected_observed_map_", District, "_", Island, "_", Year1, "_Poles_of_inaccessibility_EPSG32739.shp"))
-FILE2 <-  paste0(open_ObsMap_path, paste0("Corrected_observed_map_", District, "_", Island, "_", Year1, "_Pts_on_surface_EPSG32739.shp"))
-FILE3 <-  paste0(open_ObsMap_path, paste0("Corrected_observed_map_", District, "_", Island, "_", Year1, "_Random_points_EPSG32739.shp"))
+FILE1 <- paste0(open_ObsMap_path, paste0("/","Corrected_observed_map_", District, "_", Island, "_", Year1, "_Poles_of_inaccessibility_EPSG32739.shp"))
+FILE2 <-  paste0(open_ObsMap_path, paste0("/","Corrected_observed_map_", District, "_", Island, "_", Year1, "_Pts_on_surface_EPSG32739.shp"))
+FILE3 <-  paste0(open_ObsMap_path, paste0("/","Corrected_observed_map_", District, "_", Island, "_", Year1, "_Random_points_EPSG32739.shp"))
 
 # Load the shapefiles
 PolesInaccess <- st_read(FILE1)
@@ -160,7 +160,7 @@ Allpolys <- Allpolys[, c("id", "xcoord_m", "ycoord_m", "Longitude", "Latitude", 
 # Save the final shapefiles  -------------------
 
 # Rename columns to match export conventions
-names(Allpolys) <- c("ID", "xcoord_m", "ycoord_m", "Longitude", "Latitude", "Date", "Source", "Surface", "Hab_L1", "Hab_L2", "Hab_L3", "Hab_L4", "geometry")
+names(Allpolys) <- c("N_obs", "xcoord_m", "ycoord_m", "Longitude", "Latitude", "Date", "Source", "Surface", "Hab_L1", "Hab_L2", "Hab_L3", "Hab_L4", "geometry")
 
 # Write final quadrat polygons to a shapefile
 st_write(Allpolys, paste0(save_plots_path, "/Quadrats_", District, "_", Island, "_PHOTO-INTERPRETED_Polygons_EPSG32739.shp"), driver = "ESRI Shapefile", append = FALSE)

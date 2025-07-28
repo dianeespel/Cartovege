@@ -115,6 +115,9 @@ print(filtered_plots)
 
 # Save filtered plots -----------------------------------------------------------
 
+# Rename N_obs column into ID column
+names(filtered_plots)[names(filtered_plots) == "N_obs"] <- "ID"
+
 # Save the filtered plots to a shapefile
 st_write(filtered_plots, paste0(save_plots_path, "/Quadrats_", District, "_", Island, "_ALL_SOURCES_Polygons_EPSG32739.shp"), driver = "ESRI Shapefile", append = FALSE)
 

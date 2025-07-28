@@ -5,4 +5,4 @@ Sur Qgis,
 - les quadrats doivent être dans des zones homogènes
 - les quadrats d'une même classe doivent tomber dans des zones de même "couleur", texture.
 
-Une fois,les centroïdes corrigés, enregistrer le nouveau fichier centroide dans un fichier "Quadrat_..._ALL_..._Samples_Centroids_corrected_ESPG32735.shp" 
+Une fois,les centroïdes corrigés, enregistrer le nouveau fichier centroide dans un fichier "Quadrat_..._ALL_..._Samples_Centroids_correctedOnQgis_ESPG32735.shp" 

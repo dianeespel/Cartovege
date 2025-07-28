@@ -16,8 +16,6 @@ graphics.off()   # Close all graphics devices (if any plots are open)
 # Load required packages -------------------------------------------------------
 
 library(terra)      # For handling raster data and spatial operations
-library(resample)   # For resampling raster layers to match resolution
-
 
 # Define global variables  ---------------------------------------------------
 
@@ -40,6 +38,9 @@ localscratch=paste0("/scratch/despel/CARTOVEGE/")
 
 # Path to open input raster 
 open_cut_raster_path=paste0(localHOME,"data/raster/Cut_image")
+
+# Path to save resampled topographic rasters
+save_cut_topo_raster_path=paste0(localHOME,"data/raster/Cut_image")
 
 # Path to save raster stack
 save_cut_raster_path=paste0(localscratch,"data/raster/Cut_image")
@@ -74,8 +75,8 @@ Slope <- rast(paste0(open_cut_raster_path,"/",District,"_",Island,"_",Satellite2
 # Resample topographic rasters to match multispectral resolution
 print("Resampling DTM and slope to match the finer multispectral resolution")
 if (res(Dtm)[1]>res(R)[1]){
-  dtm_res=resample(Dtm,R)  #Resample topographic features to match R raster resolution
-  slope_res=resample(Slope,R) # Resample topographic features to match R raster  resolution
+  dtm_res=terra::resample(Dtm,R,method="bilinear")  #Resample topographic features to match R raster resolution
+  slope_res=terra::resample(Slope,R,method="bilinear") # Resample topographic features to match R raster  resolution
 }else{
   dtm_res=Dtm
   slope_res=Slope
@@ -85,14 +86,14 @@ rm(Dtm,Slope)# Remove original unresampled rasters
 
 # Correct slope values
 print("Correcting invalid slope values")
-slope_res_corr <- reclassify(slope_res, cbind(-Inf, 0, 0, 0, 90, 90, NA))# Reclassify values of slope_res in slope_res_corr
-slope_res_corr <- clamp(slope_res_corr, 0, 90) # limit values to the range [0, 90]
+slope_res_corr <- classify(slope_res, matrix(c(-Inf, 0, 0, 0, 90, 90, 90, Inf, NA), ncol=3, byrow=TRUE))# Reclassify values of slope_res 
+slope_res_corr <- clamp(slope_res_corr, lower=0, upper=90,values=FALSE) # limit values to the range [0, 90], removing any outside values
 rm(slope_res) #remove useless layers
 
 # save new layers
 print("Saving cleaned and resampled DTM and slope rasters")
-writeRaster(dtm_res,paste0(save_cut_raster_path,"/",District,"_",Island,"_",Satellite2,"_",Year2,"_",Res1,"_dtm_cut.TIF"),overwrite=T)
-writeRaster(slope_res_corr,paste0(save_cut_raster_path,"/",District,"_",Island,"_",Satellite2,"_",Year2,"_",Res1,"_slope_cut.TIF"),overwrite=T)
+writeRaster(dtm_res,paste0(save_cut_topo_raster_path,"/",District,"_",Island,"_",Satellite2,"_",Year2,"_",Res1,"_dtm_cut.TIF"),overwrite=T)
+writeRaster(slope_res_corr,paste0(save_cut_topo_raster_path,"/",District,"_",Island,"_",Satellite2,"_",Year2,"_",Res1,"_slope_cut.TIF"),overwrite=T)
 
 
 #  Stack rasters -------------------------------------------------------------

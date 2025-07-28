@@ -46,8 +46,8 @@ save_ObsMap_path=paste0(localHOME,"data/vector/Observed_map/PrimaryTypo")
 # Load an prepare polygons map -------------------------------------------------------------
 
 # List all shapefiles matching expected filename pattern
-files_corrected <- list.files(open_map_path,pattern = paste0("^Corrected_observed_map_", District, "_", Island, "_", Satellite1, "_", Year1, "_EPSG32739\\.shp$"),full.names = TRUE)
-files_observed <- list.files(open_map_path, pattern = paste0("^Observed_map_", District, "_", Island, "_", Satellite1, "_", Year1, "_EPSG32739\\.shp$"),full.names = TRUE)
+files_corrected <- list.files(open_ObsMap_path,pattern = paste0("^Corrected_observed_map_", District, "_", Island, "_", Satellite1, "_", Year1, "_EPSG32739\\.shp$"),full.names = TRUE)
+files_observed <- list.files(open_ObsMap_path, pattern = paste0("^Observed_map_", District, "_", Island, "_", Satellite1, "_", Year1, "_EPSG32739\\.shp$"),full.names = TRUE)
 
 # If a corrected file exists, use it; otherwise, use the uncorrected version (if it exists)
 if (length(files_corrected) > 0) {
@@ -82,8 +82,8 @@ polesInaccess <- st_intersection(poles_sf, polygons_map_sf)
 
 # Add coordinates in both EPSG:32739 and EPSG:4326
 polesInaccess <- cbind(polesInaccess,
-                      st_coordinates(polesInaccess),
-                      st_coordinates(st_transform(polesInaccess, 4326)))
+                       st_coordinates(polesInaccess),
+                       st_coordinates(st_transform(polesInaccess, 4326)))
 names(polesInaccess)[names(polesInaccess) == "X"] <- "xcoord_m"
 names(polesInaccess)[names(polesInaccess) == "Y"] <- "ycoord_m"
 names(polesInaccess)[names(polesInaccess) == "X.1"] <- "Longitude"
@@ -95,8 +95,8 @@ polesInaccess$Source = "PHOTO-INTERPRETATION"
 polesInaccess = polesInaccess[, c("id", "Date", "Source", "xcoord_m", "ycoord_m", "Longitude", "Latitude", "Hab_L1", "Hab_L2", "Hab_L3", "Hab_L4", "geometry")]
 
 # Save results
-st_write(polesInaccess, paste0(save_path, "/", "Corrected_observed_map_", District, "_", Island, "_", Year1, "_Poles_of_inaccessibility_EPSG32739.shp"), driver = 'ESRI Shapefile', append = FALSE)
-write.table(polesInaccess, file = paste0(save_path, "/", "Corrected_observed_map_", District, "_", Island, "_", Year1, "_Poles_of_inaccessibility_EPSG32739.csv"), sep = ";", dec = ".", row.names = FALSE)
+st_write(polesInaccess, paste0(save_ObsMap_path, "/", "Corrected_observed_map_", District, "_", Island, "_", Year1, "_Poles_of_inaccessibility_EPSG32739.shp"), driver = 'ESRI Shapefile', append = FALSE)
+write.table(polesInaccess, file = paste0(save_ObsMap_path, "/", "Corrected_observed_map_", District, "_", Island, "_", Year1, "_Poles_of_inaccessibility_EPSG32739.csv"), sep = ";", dec = ".", row.names = FALSE)
 
 # Get Points on Surface -------------------------------------------------------------
 
@@ -122,8 +122,8 @@ ptOnSurface$Source = "PHOTO-INTERPRETATION"
 ptOnSurface = ptOnSurface[, c("id", "Date", "Source", "xcoord_m", "ycoord_m", "Longitude", "Latitude", "Hab_L1", "Hab_L2", "Hab_L3", "Hab_L4", "geometry")]
 
 # Save results
-st_write(ptOnSurface, paste0(save_path, "/", "Corrected_observed_map_", District, "_", Island, "_", Year1, "_Pts_on_surface_EPSG32739.shp"), driver = 'ESRI Shapefile', append = FALSE)
-write.table(ptOnSurface, file = paste0(save_path, "/", "Corrected_observed_map_", District, "_", Island, "_", Year1, "_Pts_on_surface_EPSG32739.csv"), sep = ";", dec = ".", row.names = FALSE)
+st_write(ptOnSurface, paste0(save_ObsMap_path, "/", "Corrected_observed_map_", District, "_", Island, "_", Year1, "_Pts_on_surface_EPSG32739.shp"), driver = 'ESRI Shapefile', append = FALSE)
+write.table(ptOnSurface, file = paste0(save_ObsMap_path, "/", "Corrected_observed_map_", District, "_", Island, "_", Year1, "_Pts_on_surface_EPSG32739.csv"), sep = ";", dec = ".", row.names = FALSE)
 
 
 
@@ -212,6 +212,6 @@ RandomPts=RandomPts[,c("id","Date","Source","xcoord_m","ycoord_m","Longitude","L
 
 
 # Save as Shapefile
-st_write(RandomPts, paste0(save_path, "/", "Corrected_observed_map_", District, "_", Island, "_", Year1, "_Random_points_EPSG32739.shp"),driver = 'ESRI Shapefile', append = FALSE)
-write.table(RandomPts,file=paste0(save_path, "/", "Corrected_observed_map_", District, "_", Island, "_", Year1, "_Random_points_EPSG32739.csv"),sep = ";", dec = ".", row.names = FALSE)
+st_write(RandomPts, paste0(save_ObsMap_path, "/", "Corrected_observed_map_", District, "_", Island, "_", Year1, "_Random_points_EPSG32739.shp"),driver = 'ESRI Shapefile', append = FALSE)
+write.table(RandomPts,file=paste0(save_ObsMap_path, "/", "Corrected_observed_map_", District, "_", Island, "_", Year1, "_Random_points_EPSG32739.csv"),sep = ";", dec = ".", row.names = FALSE)
 
