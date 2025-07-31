@@ -133,24 +133,34 @@ Spdf_field_polys <- st_sf(
 cat("Filtering overlapping quadrats...\n")
 print("If overlap occurs, keep the first quadrat and remove the intersecting ones.")
 
-keep_rows <- rep(TRUE, nrow(Spdf_field_polys)) # Start by keeping all rows
+# Logical matrix indicating which features overlap (not just intersect)
+overlap_matrix <- st_overlaps(Spdf_field_polys, sparse = FALSE)
+
+# Find indices of features that overlap with at least one other
+overlapping_entities <- which(rowSums(overlap_matrix) > 0)
+
+# Extract these overlapping polygons
+overlapping_polygons <- Spdf_field_polys[overlapping_entities, ]
+
+# Number of features
+n <- nrow(Spdf_field_polys)
+
+# Vector to mark polygons to keep (TRUE = keep)
+keep <- rep(TRUE, n)
 
 # Loop to detect overlaps and flag the later duplicates
-for (i in seq_len(nrow(Spdf_field_polys))) {
-  if (!keep_rows[i]) next  # Skip if already excluded
-  for (j in seq((i+1), nrow(Spdf_field_polys))) {
-    if (!keep_rows[j]) next
-    if (st_intersects(Spdf_field_polys[i, ], Spdf_field_polys[j, ], sparse = FALSE)[1,1]) {
-      cat(sprintf("Entity %d overlaps with %d — removing %d\n", j, i, j))
-      keep_rows[j] <- FALSE
-    }
-  }
+for (i in 1:n) {
+  if (!keep[i]) next  # Skip if already excluded
+  
+  # Find polygons that overlap with polygon i (excluding itself)
+  overlapping <- which(overlap_matrix[i, ] & (1:n != i))
+  
+  # Mark these overlapping polygons for removal (keep = FALSE)
+  keep[overlapping] <- FALSE
 }
 
-
-
 # Filter to retain only non-overlapping quadrats
-Allpolys <- Spdf_field_polys[keep_rows, ]
+Allpolys <- Spdf_field_polys[keep, ]
 
 # Reorder columns for final export
 Allpolys <- Allpolys[, c("id", "xcoord_m", "ycoord_m", "Longitude", "Latitude", "Date", "Source", "Surface", "Hab_L1", "Hab_L2", "Hab_L3", "Hab_L4", "geometry")]

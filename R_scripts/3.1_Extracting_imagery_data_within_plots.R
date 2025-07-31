@@ -58,8 +58,7 @@ cat("Raster CRS:", crs(raster_total), "\n") # Print raster Coordinate Reference 
 # Load the quadrats (learning plots)
 print("Loading learning plots")
 FILE1=paste0(open_plots_path,"/Quadrats_", District, "_", Island, "_ALL_SOURCES_Polygons_EPSG32739.shp")
-
-quadrats_sf <- st_read(shapefile_path) # Load shapefile as sf object
+quadrats_sf <- st_read(open_plots_path) # Load shapefile as sf object
 cat("Quadrats CRS:", st_crs(quadrats_sf)$epsg, "\n") # Print CRS of shapefile
 
 # Convert sf object to terra-compatible SpatVector
@@ -78,11 +77,10 @@ extracted_data <- terra::extract(
   y=quadrats_vect,           # 	SpatVector polygons (quadrats)
   fun = mean,                # Function to apply to pixels (mean)
   weights = TRUE,            # Use area-based weights (partial pixel contributions)
-  normalizeWeights = TRUE,   # Normalize weights to sum to 1 per polygon
-  df = TRUE,                 # Return as data.frame
   na.rm = TRUE               # Exclude NA values
 )
 
+print("Extraction drone")
 
 # Combine the extracted raster values with original quadrat attributes
 learning_data <- cbind(quadrats_sf, extracted_data[,-1]) # Remove first column (ID) before merging
@@ -98,7 +96,7 @@ save(all_learning_plots, file = paste0(save_learning_primary_path,"/Learning_plo
 write.table(all_learning_plots,file =paste0(save_learning_primary_path,"/Learning_plots_", District, "_", Island,"_",Satellite1,"_",Year1,"_ALL_SOURCES_EPSG32739.csv"), sep = ";", dec = ".", row.names = FALSE)
 
 # Save a filtered dataset excluding photo-interpreted plots
-true_learning_plots=subset(learning_data$Source!="PHOTO-INTERPRETATION")
+true_learning_plots=subset(learning_data,Source!="PHOTO-INTERPRETATION")
 print(paste0("Number of field learning plots: ", nrow(true_learning_plots)))
 save(true_learning_plots, file = paste0(save_learning_primary_path,"/Learning_plots_", District, "_", Island,"_",Satellite1,"_",Year1,"_TRUE_SOURCES_EPSG32739.Rdata"))
 write.table(true_learning_plots,file =paste0(save_learning_primary_path,"/Learning_plots_", District, "_", Island,"_",Satellite1,"_",Year1,"_TRUE_SOURCES_EPSG32739.csv"), sep = ";", dec = ".", row.names = FALSE)

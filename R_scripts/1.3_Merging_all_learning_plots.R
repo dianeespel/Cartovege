@@ -79,34 +79,38 @@ if (exists("HFI_true_plots")) {
 priority_order <- c("FIELD" = 1, "PHOTO-INTERPRETATION" = 2, "HFI" = 3) # assuming HFI correspond to historical values
 all_plots$priority <- priority_order[ all_plots$Source ] # Create a priority column based on the Source column
 
-# Initialize a logical vector to keep track of plots to retain
-keep <- rep(TRUE, nrow(all_plots)) # Initially assume all plots are first marked as TRUE (to keep)
 
-# Loop to detect and resolve spatial overlaps by priority
-for (i in seq_len(nrow(all_plots) - 1)) {
-  print(paste0("Processing quadrat", i)) # Debug message
+# Compute all intersecting pairs (list of neighbors for each polygon)
+intersections_list <- st_intersects(all_plots, sparse = TRUE)
+
+# Create a data frame with pairs (i,j) where i < j to avoid duplicates
+pairs <- do.call(rbind, lapply(seq_along(intersections_list), function(i) {
+  js <- intersections_list[[i]]
+  js <- js[js > i]  # only keep pairs where j > i
+  if (length(js) == 0) return(NULL)
+  data.frame(i = i, j = js)
+}))
+
+# Initialize vector to keep track of polygons to retain
+keep <- rep(TRUE, nrow(all_plots))
+
+# Loop over intersecting pairs to resolve overlaps by priority
+for (k in seq_len(nrow(pairs))) {
+  i <- pairs$i[k]
+  j <- pairs$j[k]
   
-  if (!keep[i]) next  # Skip if quadrat i is already marked for removal, we skip it
-  for (j in (i + 1):nrow(all_plots)) {
-    if (!keep[j]) next  # Skip if quadrat j is already marked for removal, we skip it
-    
-    # Check if quadrat i and quadrat j intersect
-    if (st_intersects(all_plots[i, ], all_plots[j, ], sparse = FALSE)[1, 1]) {
-      
-      # Compare priorities: lower number means higher priority
-      if (all_plots$priority[i] <= all_plots$priority[j]) {
-        # If quadrat i is of equal or higher priority than j, mark j for removal
-        keep[j] <- FALSE
-      } else {
-        # Otherwise, mark i for removal and exit the inner loop
-        keep[i] <- FALSE
-        break
-      }
-    }
+  # Skip if either polygon already excluded
+  if (!keep[i] || !keep[j]) next
+  
+  # Compare priorities (lower number = higher priority)
+  if (all_plots$priority[i] <= all_plots$priority[j]) {
+    keep[j] <- FALSE
+  } else {
+    keep[i] <- FALSE
   }
 }
 
-# Filter dataset to retain only non-overlapping, highest-priority plots
+# Filter the polygons to keep only the highest priority non-overlapping ones
 filtered_plots <- all_plots[keep, ]
 
 # Print final retained plots to the console

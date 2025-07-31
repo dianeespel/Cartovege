@@ -47,11 +47,10 @@ open_plots_path=paste0(localHOME,"data/vector/Plots/PrimaryTypo")
 # path where to save your results
 save_plots_path=paste0(localHOME,"data/vector/Plots/PrimaryTypo")
 
-
 # Load learning data -------------------------------------------------------------
 
 FILE1=paste0(open_plots_path,"/Quadrats_", District, "_", Island, "_ALL_SOURCES_Centroids_EPSG32739.csv")
-learning_points <- read.csv(FILE1, sep=",",dec=".",stringsAsFactors=FALSE) # `stringsAsFactors=F` ensures character strings don't import as factors
+learning_points <- read.csv(FILE1, sep=";",dec=".",stringsAsFactors=FALSE) # `stringsAsFactors=F` ensures character strings don't import as factors
 
 
 # Analyse habitat class distribution  -------------------------------------------------------------
@@ -59,15 +58,14 @@ learning_points <- read.csv(FILE1, sep=",",dec=".",stringsAsFactors=FALSE) # `st
 # Define the type of samples plot you have
 source_list=c("FIELD","HFI","PHOTO-INTERPRETATION","ALL")
 
-
 # Run the script for each sample type in plot_list and for each level of classification 
 for (s in source_list){
   
   print(paste0("Plot source: ", s))
   if(s=="ALL"){
-    learning_points=learning_points
+    learning_points_source=learning_points
   }else{
-    learning_points=subset(learning_points,learning_points$Source==s)
+    learning_points_source=subset(learning_points,learning_points$Source==s)
   }
   
   # Level loop
@@ -81,8 +79,8 @@ for (s in source_list){
     
     
     # Compute frequency of habitat types  for level of interest
-    ihab=which(colnames(learning_points)==paste0("Hab_L",l))
-    frequency_hab <- as.data.frame(table(learning_points[,ihab]))
+    ihab=which(colnames(learning_points_source)==paste0("Hab_L",l))
+    frequency_hab <- as.data.frame(table(learning_points_source[,ihab]))
     frequency_hab[,1]=as.character(frequency_hab[,1])
     colnames(frequency_hab)=c(paste0("Hab_L",l), "Plot_number")
     
@@ -92,12 +90,12 @@ for (s in source_list){
     # Bar plot (png format)
     NOMpng=paste0(LevelFolder,"/","Nb_quadrats_",District,"_",Island,"_",s,"_SOURCES_level_",l,".png")
     png(file = NOMpng, width = 1000, height = 600)
-    p <- ggplot(frequency_hab, aes(x = Type_habitat, y = Nombre_echantillons, fill = Type_habitat)) +
+    p <- ggplot(frequency_hab, aes(x = Type_habitat, y = Plot_number, fill = Type_habitat)) +
       geom_bar(stat = "identity") + # Create a bar plot
-      geom_text(aes(label = Nombre_echantillons), vjust = -0.5, color = "black", size = 4) + # Add data labels
-      labs(title = paste0(sample," : Plot number per habitat class - Level ", l), # Set plot titles and axis labels
+      geom_text(aes(label =Plot_number), vjust = -0.5, color = "black", size = 8) + # Add data labels
+      labs(title = paste0("Source :",s, " Plot number per habitat class - Level ", l), # Set plot titles and axis labels
            x = "Habitat class",
-           y = "Plot number") +
+           y = "Number of plots") +
       theme_classic() + # Apply classic theme
       theme(axis.text.x = element_text(size = 13, angle = 90, hjust = 1),  # Customize axis labels
             axis.text.y = element_text(size = 13), 

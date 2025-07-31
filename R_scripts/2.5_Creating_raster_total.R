@@ -86,7 +86,7 @@ rm(Dtm,Slope)# Remove original unresampled rasters
 
 # Correct slope values
 print("Correcting invalid slope values")
-slope_res_corr <- classify(slope_res, matrix(c(-Inf, 0, 0, 0, 90, 90, 90, Inf, NA), ncol=3, byrow=TRUE))# Reclassify values of slope_res 
+slope_res_corr <- classify(slope_res, matrix(c(-Inf, 0, 0, 90, Inf, 90), ncol=3, byrow=TRUE))# Reclassify values of slope_res 
 slope_res_corr <- clamp(slope_res_corr, lower=0, upper=90,values=FALSE) # limit values to the range [0, 90], removing any outside values
 rm(slope_res) #remove useless layers
 

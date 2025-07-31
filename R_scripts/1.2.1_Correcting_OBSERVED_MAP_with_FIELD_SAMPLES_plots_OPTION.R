@@ -172,10 +172,6 @@ intersect_polys_corr[, ih2map] = substr(intersect_polys_corr$New_hab, 1, 3)    #
 intersect_polys_corr[, ih3map] = substr(intersect_polys_corr$New_hab, 1, 5)    # Level 3 code (first 5 characters)
 intersect_polys_corr[, ih4map] = intersect_polys_corr$New_hab                   # Level 4 code (full string)
 
-# Keep only columns up to 'id' column to trim data frame
-idmap = which(colnames(intersect_polys_corr) == "id")
-intersect_polys_corr = intersect_polys_corr[, 1:idmap]
-
 print("Corrected dataframe of intersected polygons is ready")
 
 # Correct the original observed_MAP with updated classification from intersected polygons -------------------------------------------------------------
@@ -184,6 +180,9 @@ print("Correcting the observed_MAP using the corrected intersected polygons data
 
 # Create a copy of observed_map for correction
 observed_map_corr <- observed_map
+
+# Identifiy id column
+idmap = which(colnames(intersect_polys_corr) == "id")
 
 # Loop over each polygon ID to update habitat classes
 for (i in ID_list) {
