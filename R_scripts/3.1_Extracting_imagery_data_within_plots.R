@@ -89,14 +89,20 @@ learning_data <- st_as_sf(learning_data, coords = c("xcoord_m", "ycoord_m"), crs
 
 # Saving learning data ----------------------------------------------
 
+# Filter out rows that contain NA or Inf values within the selected columns
+subset_cols <- which(names(learning_data) == "R"):which(names(learning_data) == "Slope") # Identify the column indices from "R" to "Slope"
+learning_data_clean <- learning_data[apply(learning_data[, subset_cols], 1, function(row) {
+  all(!is.na(row) & !is.infinite(row))
+}), ]
+
 # Save complete dataset
-all_learning_plots=learning_data
+all_learning_plots=learning_data_clean
 print(paste0("Number of all learning plots: ", nrow(all_learning_plots)))
 save(all_learning_plots, file = paste0(save_learning_primary_path,"/Learning_plots_", District, "_", Island,"_",Satellite1,"_",Year1,"_ALL_SOURCES_EPSG32739.Rdata"))
 write.table(all_learning_plots,file =paste0(save_learning_primary_path,"/Learning_plots_", District, "_", Island,"_",Satellite1,"_",Year1,"_ALL_SOURCES_EPSG32739.csv"), sep = ";", dec = ".", row.names = FALSE)
 
 # Save a filtered dataset excluding photo-interpreted plots
-true_learning_plots=subset(learning_data,Source!="PHOTO-INTERPRETATION")
+true_learning_plots=subset(learning_data_clean,Source!="PHOTO-INTERPRETATION")
 print(paste0("Number of field learning plots: ", nrow(true_learning_plots)))
 save(true_learning_plots, file = paste0(save_learning_primary_path,"/Learning_plots_", District, "_", Island,"_",Satellite1,"_",Year1,"_TRUE_SOURCES_EPSG32739.Rdata"))
 write.table(true_learning_plots,file =paste0(save_learning_primary_path,"/Learning_plots_", District, "_", Island,"_",Satellite1,"_",Year1,"_TRUE_SOURCES_EPSG32739.csv"), sep = ";", dec = ".", row.names = FALSE)

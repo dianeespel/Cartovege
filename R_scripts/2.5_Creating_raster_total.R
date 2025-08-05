@@ -36,6 +36,9 @@ localHOME=paste0("/home/genouest/cnrs_umr6553/despel/CARTOVEGE/")
 localscratch=paste0("/scratch/despel/CARTOVEGE/")
 #localscratch = paste0("your_local_path/")
 
+# Path to open potential cloud mask
+open_mask_path <- paste0(localHOME, "/data/vector/mask")
+
 # Path to open input raster 
 open_cut_raster_path=paste0(localHOME,"data/raster/Cut_image")
 
@@ -121,6 +124,39 @@ print("Creating raster stack: all MS bands + indices + topographic layers")
 raster_total<- c(raster_MS,raster_indices,dtm_res,slope_res_corr) #stack all layers
 names(raster_total)= c("R", "G", "B", "NIR","NDVI","GRVI","VARI","GCCI","Brightness","BSI","NDWI","Dtm","Slope") # rename layers in the raster stack
 rm(raster_MS,raster_indices,dtm_res,slope_res_corr) # remove useless layers
-writeRaster(raster_total,paste0(save_cut_raster_path,"/",District,"_",Island,"_",Satellite1,"_Total_raster_stack_",Year1,"_",Res1,"_cut.TIF"))
-print(raster_total)
+
+#  Mask clouds and buildings if present
+cloud_mask_file <- paste0(open_mask_path, "/",District,"_",Island,"_Clouds_Buildings_",Year1,"_EPSG32739.shp")
+
+if (file.exists(cloud_mask_file)) {
+  
+  cat("Mask shapefile found, masking out pixels inside the polygon...\n")
+  
+  # Load the mask shapefile as a vector object
+  cloud_mask <- vect(cloud_mask_file)
+  
+  # Check CRS of raster and vector, reproject vector if different
+  raster_crs <- crs(raster_total)
+  vector_crs <- crs(cloud_mask)
+  
+  if (!identical(raster_crs, vector_crs)) {
+    cloud_mask <- project(cloud_mask, raster_crs)
+  }
+  
+  # Rasterize mask polygon: pixels inside polygon = 1, outside = 0
+  mask_raster <- rasterize(cloud_mask, raster_total, field=1, background=0)
+  
+  # Invert mask: TRUE outside polygon (0), FALSE inside polygon (1)
+  inverted_mask <- mask_raster == 0
+  
+  # Mask raster_total to remove pixels inside polygon
+  raster_total2 <- mask(raster_total, inverted_mask, maskvalues=FALSE)
+  
+} else {
+  cat("Mask shapefile NOT found, skipping masking.\n")
+  raster_total2=raster_total
+}
+
+writeRaster(raster_total2,paste0(save_cut_raster_path,"/",District,"_",Island,"_",Satellite1,"_Total_raster_stack_",Year1,"_",Res1,"_cut.TIF"))
+print(raster_total2)
 
