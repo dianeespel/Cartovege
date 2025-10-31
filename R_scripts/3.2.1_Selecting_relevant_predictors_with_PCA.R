@@ -325,16 +325,14 @@ for (k in seq_len(nrow(highly_corr_pairs))) {
 final_selected_vars <- setdiff(selected_vars, unique(vars_to_remove))
 
 # Print results
-cat("Initial selected variables:", length(selected_vars), "\n")
-cat("Removed due to correlation:", length(unique(vars_to_remove)), "\n")
-cat("Final selected variables:", length(final_selected_vars), "\n")
 print(final_selected_vars)
 
 
 # Final learning dataset --------------------------------------------------
 
 # Create final dataset with the selected variables
-learning_data_selected <- learning_data[, !(colnames(learning_data) %in% vars_to_remove)]
+final_vars_to_remove <- setdiff(names(tab_norm), final_selected_vars) # define variables to remove
+learning_data_selected <- learning_data[, !(colnames(learning_data) %in% final_vars_to_remove)]
 FILE7=paste0(save_learning_primary_path,"/Selected_learning_plots_", District, "_", Island,"_",Satellite1,"_",Year1,"_ALL_SOURCES_EPSG32739.csv")
 write.table(learning_data_selected ,file =FILE7, sep = ";", dec = ".", row.names = FALSE)
 

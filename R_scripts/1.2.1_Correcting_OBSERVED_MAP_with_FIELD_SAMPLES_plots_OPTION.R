@@ -107,6 +107,10 @@ print(id_doublons_map)    # Print any duplicate IDs found in observed map
 
 print("Identify FIELD samples falling within polygons of the map")
 
+# Remove potential dots ('.') from the values in columns Hab_L1 to Hab_L4
+observed_map <- observed_map %>%
+  mutate(across(c(Hab_L1, Hab_L2, Hab_L3, Hab_L4), ~ gsub("\\.", "", .)))
+
 # Check and match coordinate reference systems (CRS)
 st_crs(observed_map) == st_crs(field_samples)  
 

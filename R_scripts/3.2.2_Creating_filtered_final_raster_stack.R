@@ -60,7 +60,7 @@ learning_data <- read.csv(FILE1, sep=";", dec=".", stringsAsFactors=FALSE)
 
 # Drop habitat classes and coordinate/id columns to keep only predictor variables
 variable_df <- learning_data %>%
-  select(-matches("^Hab_L[1-4]$"), -id, -xcoord_m, -ycoord_m)
+  select(-matches("^Hab_L[1-4]$"), -ID, -xcoord_m, -ycoord_m,-Latitude,-Longitude,-Date,-Source,-Surface)
 
 # Extract variable names
 list_variables <- names(variable_df)
@@ -91,7 +91,7 @@ for (Year in available_satellite1_years) {
     expected_names <- c("R", "G", "B", "NIR", "NDVI", "GRVI", "VARI", "GCCI", "Brightness", "BSI", "NDWI", "Dtm", "Slope")
     
     # Only rename layers if the number of layers matches
-    if (nlayers(raster_total) == length(expected_names)) {
+    if (nlyr(raster_total) == length(expected_names)) {
       names(raster_total) <- expected_names
     } else {
       warning("Unexpected number of layers in total raster stack")
@@ -111,6 +111,7 @@ for (Year in available_satellite1_years) {
     # For other years, reconstruct stack layer by layer
     cat("\nProcessing year:", Year, "\n")
     
+    list_variables <- tolower(list_variables) # write variables to lowercase to match raster names
     raster_list <- list()  # Initialize list of rasters
     
     for (var in list_variables) {

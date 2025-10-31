@@ -80,7 +80,7 @@ RandomPts <- RandomPts[, common_columns]
 all_points <- bind_rows(PolesInaccess , PtOnSurface, RandomPts)
 
 # Check for duplicate IDs and correct if needed
-if (any(duplicated(all_points$id))) {
+if (any(duplicated(all_points$id))==T) {
   warning("Duplicate IDs detected — correcting them.")
   print(unique(all_points$id[duplicated(all_points$id)]))
   all_points$id <- as.character(seq_len(nrow(all_points))) # Replace with unique IDs

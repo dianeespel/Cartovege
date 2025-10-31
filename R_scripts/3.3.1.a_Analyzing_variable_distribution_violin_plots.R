@@ -42,11 +42,16 @@ save_learning_primary_path=paste0(localscratch,"data/Learning_data/PrimaryTypo")
 
 # Load learning data  -------------------------------------------------------------
 
-FILE1 <- paste0(open_learning_primary_path, "/Learning_plots_", District, "_", Island,"_",Satellite1,"_",Year1,"_ALL_SOURCES_EPSG32739.csv")
+FILE1 <- paste0(open_learning_primary_path, "/Selected_learning_plots_", District, "_", Island,"_",Satellite1,"_",Year1,"_ALL_SOURCES_EPSG32739.csv")
 learning_data=read.csv(FILE1, sep=";",dec=".",stringsAsFactors=FALSE) # `stringsAsFactors=F` ensures character strings don't import as factors
 
 # Analyze distribution of each predictor value across habitat levels -------------------------------------------------------------
 
+# Normalize spectral/topographic variables (between 0 and 1)
+ihab=which(colnames(learning_data)==paste0("Hab_L",l))
+ihab4=which(colnames(learning_data)=="Hab_L4")
+learning_normalized <- learning_data%>%
+  mutate(across((ihab4 + 1):(ncol(learning_data)), ~ (.-min(.))/(max(.)-min(.))))
 
 # Loop through each habitat classification level
 for (l in seq (1:maxTypoLevel)){
@@ -56,12 +61,7 @@ for (l in seq (1:maxTypoLevel)){
   # Create a directory to store results for the current level
   LevelFolder=paste0(save_learning_primary_path,"/","Hab_L",l)
   dir.create(LevelFolder,showWarnings=F) # ShowWarnings=F to remove warnings message if file already exists
-  
-  # Normalize spectral/topographic variables (between 0 and 1)
-  ihab=which(colnames(learning_data)==paste0("Hab_L",l))
-  ihab4=which(colnames(learning_data)=="Hab_L4")
-  learning_normalized <- learning_data%>%
-    mutate(across((ihab4 + 1):(ncol(learning_data)-2), ~ (.-min(.))/(max(.)-min(.))))
+
   
   # Get list of variable names to analyze
   variable_list <- colnames(learning_normalized)[(ihab4 + 1):ncol(learning_normalized)]
@@ -105,8 +105,8 @@ for (l in seq (1:maxTypoLevel)){
     ihab=which(colnames(learning_normalized)==paste0("Hab_L",l))
    
     # Define y-axis and x-axis limits based on variable type
-    ylim_values <- c(B = 0.5, R = 0.5, G = 0.5, Brightness = 0.5, GCCI = 0.5, NIR = 1, NDWI = 0.75, NDVI = 1, VARI = 0.75, BSI = 0.475, Dtm = 600, Slope = 75)
-    xlim_values <- c(B = 0, R = 0, G = 0, Brightness = 0, GCCI = 0, NIR = 0, NDWI = 0, NDVI = 0.4, VARI = 0.6, BSI = 0.425, Dtm = 0, Slope = 0)
+    ylim_values <- c(v = 1)
+    xlim_values <- c(v = 0)
     
     # Set default axis limits if variable is not in predefined list
     default_ylim <- 1

@@ -46,7 +46,7 @@ save_learning_primary_path=paste0(localscratch,"data/Learning_data/PrimaryTypo")
 
 # Load learning data  -------------------------------------------------------------
 
-FILE1=paste0(open_learning_primary_path,"/","Learning_plots_", District, "_", Island,"_",Satellite1,"_",Year1,"_ALL_SOURCES_EPSG32739.csv")
+FILE1=paste0(open_learning_primary_path,"/","Selected_learning_plots_", District, "_", Island,"_",Satellite1,"_",Year1,"_ALL_SOURCES_EPSG32739.csv")
 learning_data <- read.csv(FILE1, sep=";",dec=".",stringsAsFactors=FALSE) # `stringsAsFactors=F` ensures character strings don't import as factors
 
 

@@ -16,6 +16,7 @@ graphics.off()   # Close all graphics devices (if any plots are open)
 # Required packages -------------------------------------------------------
 
 library(sf)     # For handling spatial vector data (modern replacement for 'rgdal')
+library(dplyr)  # For mutate() function
 
 # Define global variables  ---------------------------------------------------
 
@@ -121,6 +122,10 @@ print(filtered_plots)
 
 # Rename N_obs column into ID column
 names(filtered_plots)[names(filtered_plots) == "N_obs"] <- "ID"
+
+# Remove potential dots ('.') from the values in columns Hab_L1 to Hab_L4
+filtered_plots <- filtered_plots %>%
+  mutate(across(c(Hab_L1, Hab_L2, Hab_L3, Hab_L4), ~ gsub("\\.", "", .)))
 
 # Save the filtered plots to a shapefile
 st_write(filtered_plots, paste0(save_plots_path, "/Quadrats_", District, "_", Island, "_ALL_SOURCES_Polygons_EPSG32739.shp"), driver = "ESRI Shapefile", append = FALSE)
