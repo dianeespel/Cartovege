@@ -51,5 +51,5 @@ slope <- terrain(dtm, v = "slope",unit="degrees", neighbors=8)  # 'v' specifies 
 
 # save slope raster
 slope_file <- paste0(save_precut_raster_path,"/",District,"_",Island,"_",Satellite2, "_",Year2,"_",Res2, "_slope_precut.tif")
-writeRaster(slope, filename = slope_file, format = "GTiff")
+writeRaster(slope, filename = slope_file)
 
