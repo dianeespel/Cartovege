@@ -27,4 +27,51 @@ This pipeline is open source but protected by a MIT Licence.
 
 Please cite this pipeline using the following DOI: https://doi.org/10.5281/zenodo.15827741
 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+⚙️ Prerequisites
+
+Make sure you have R 3.2 (or later) installed.
+
+Clone the repository: 
+```
+git clone https://github.com/dianeespel/Cartovege.git
+cd Cartovege
+```
+
+Set up your environment:
+The _requirements/_ folder contains the .yml files for the different environments used in the project.
+Choose the one that fits your needs and create the environment using conda:
+```
+conda env create -f requirements/environment_name.yml
+conda activate environment_name
+```
+
+
+🚀 Usage
+
+1) Data preparation:
+Place your satellite image(s) (GeoTIFF) and reference polygons (Shapefile) in the respective folders.
+
+2) Configuration:
+Before each script edit the file to specify input and output paths
+
+3) Run the pipeline:
+Execute the main script from the terminal:
+
+
+📂 Project structure
+```
+Cartovege/
+│
+├── data/                # Input satellite images and reference data
+├── Requirements/        # Conda environments (.yml files)
+├── R_scripts/           # Processing and analysis scripts
+├── Rmarkdown_tutorials/ # R markdown files
+├── LICENCE.txt          # MIT Licence file
+└── README.md            # Project documentation
+```
+
+
+
 
