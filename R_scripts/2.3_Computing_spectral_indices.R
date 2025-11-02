@@ -28,15 +28,13 @@ library(stats)   # For basic statistical functions (usually loaded by default)
 District='CRO' # 3-letter code for archipelago (e.g. Crozet)
 Island='POS'   # 3-letter code for island (e.g. Possession)
 Satellite1="Pleiades" # satellite name of multispectral imagery
-Year1="2022"    # acquisition year of multispectral imagery
-Month1="02" # acquisition month of multispectral imagery
 Res1 = "50cm"  # spatial resolution of multispectral imagery
 
 
 # Create functions -------------------------------------------------------
 
 # Function to compute and export several spectral indices from MS bands
-SpectralIndices<- function(archipelago,island,red,green,blue,nir,nameSat,year,month,resImage){
+SpectralIndices<- function(archipelago,island,red,green,blue,nir,nameSat,year,month,resImage,save_path){
   
   # Formulae for spectral indices
   ndvi_raster=(nir-red)/(nir+red) # Normalized difference vegetation index (Pettorelli, 2013)
@@ -49,7 +47,7 @@ SpectralIndices<- function(archipelago,island,red,green,blue,nir,nameSat,year,mo
   
   # Recording path for spectral indices
   make_path <- function(index) {
-    paste0(archipelago, "_", island, "_", nameSat, "_", year, "_", month, "_", resImage, "_", index, "_cut.TIF")
+    file.path(save_path, paste0(archipelago, "_", island, "_", nameSat, "_", year, "_", month, "_", resImage, "_", index, "_cut.TIF"))
   }
   
   # Recording indices
@@ -74,7 +72,6 @@ SpectralIndices<- function(archipelago,island,red,green,blue,nir,nameSat,year,mo
   
 }
 
-
 # Set working directory -------------------------------------------------------------
 
 # Base local path (customize to your local environment)
@@ -88,22 +85,48 @@ open_cut_raster_path=paste0(localHOME ,"data/raster/Cut_image")
 save_cut_raster_path=paste0(localHOME,"data/raster/Cut_image")
 
 
-# Load input MS raster per band----------------------------------------------------------
+# Run SpectralIndices() for each available year and month----------------------------------------------------------
 
-print("Loading raster bands")
-R <- rast(paste0(open_cut_raster_path,"/",District,"_",Island,"_",Satellite1, "_",Year1,"_",Month1,"_",Res1, "_band3_cut.TIF"))
-G <- rast(paste0(open_cut_raster_path,"/",District,"_",Island,"_",Satellite1, "_",Year1,"_",Month1,"_",Res1, "_band2_cut.TIF"))
-B <- rast(paste0(open_cut_raster_path,"/",District,"_",Island,"_",Satellite1, "_",Year1,"_",Month1,"_",Res1, "_band1_cut.TIF"))
-NIR <- rast(paste0(open_cut_raster_path,"/",District,"_",Island,"_",Satellite1, "_",Year1,"_",Month1,"_",Res1, "_band4_cut.TIF"))
+# List of years and months
+all_years <- c("2025","2024","2023","2022","2021","2020","2015","2011")
+all_months <- c("01","02","03","04","05","06","07","08","09","10","11","12")
 
-setwd(save_cut_raster_path)
-getwd()
-
-# Run SpectralIndices() function ----------------------------------------------------------
-
-
-print("Spectral indices are computed")
-SpectralIndices(archipelago=District,island=Island,red=R,green=G,blue=B,nir=NIR,nameSat=Satellite1,year=Year1,month=Month1,resImage=Res1)
-
-
+# Run the loop on available rasters
+for (Year1 in all_years) {
+  
+  print(paste0("Year: ", Year1))
+  
+  for (Month1 in all_months) {
+    print(paste0("Month: ", Month1))
     
+    raster_path_blue <- file.path(open_cut_raster_path, paste0(District, "_", Island, "_", Satellite1, "_", Year1, "_", Month1, "_", Res1, "_band1_cut.tif"))
+    raster_path_green <- file.path(open_cut_raster_path, paste0(District, "_", Island, "_", Satellite1, "_", Year1, "_", Month1, "_", Res1, "_band2_cut.tif"))
+    raster_path_red <- file.path(open_cut_raster_path, paste0(District, "_", Island, "_", Satellite1, "_", Year1, "_", Month1, "_", Res1, "_band3_cut.tif"))
+    raster_path_nir <- file.path(open_cut_raster_path, paste0(District, "_", Island, "_", Satellite1, "_", Year1, "_", Month1, "_", Res1, "_band4_cut.tif"))
+    
+    # Test that ALL four files exist
+    all_exist <- all(file.exists(c(raster_path_blue, raster_path_green, raster_path_red, raster_path_nir)))
+    
+    if (!all_exist) {
+      message(" One or more band files missing for ", Year1, "-", Month1, " -> skipping.")
+      next
+    }
+    
+    
+    # Load rasters
+    B <- rast(raster_path_blue)
+    G <- rast(raster_path_green)
+    R <- rast(raster_path_red)
+    NIR <- rast(raster_path_nir)
+    
+    # Compute indices and write to save_path
+    message(" Computing spectral indices for ", Year1, "-", Month1)
+    SpectralIndices(archipelago=District,island=Island,red=R,green=G,blue=B,nir=NIR,nameSat=Satellite1,year=Year1,month=Month1,resImage=Res1,save_path = save_cut_raster_path)
+    
+  } # end of month
+} # end of year
+
+
+
+
+

@@ -34,62 +34,34 @@ is_Same_Resolution <- function(band1, band2){
 
 
 # Function to mask raster based on polygon and handle MS-specific issues
-Raster_Masking <- function(archipelago, island, vector_mask, raster, nameSat, year, month = NULL, resolution, raster_type){
-
+Raster_Masking <- function(archipelago, island, vector_mask, raster, nameSat, year, month = NULL, resolution, raster_type, save_path){
+  
   # Reproject vector if CRS differ
   if (!crs(raster) == crs(vector_mask)) {
     vector_mask <- project(vector_mask, crs(raster))
   }
   
-  # Determine the number of bands in the raster
-  num_bands <- nlyr(raster)  # Get the number of layers (bands)
+  num_bands <- nlyr(raster)
   
   if (raster_type == "PMS") {
     
-    # Check and harmonize resolution between RGB and NIR bands
-    res_ok <- is_Same_Resolution(raster[[1]], raster[[num_bands]])# Assuming the first band is blue, green or red and the last band is NIR 
+    # Harmonize resolution if needed
+    res_ok <- is_Same_Resolution(raster[[1]], raster[[num_bands]])
     if (!res_ok) {
-      res_sup <- res(raster[[1]])  # coarse resolution (e.g. RGB)
-      res_inf <- res(raster[[num_bands]])   # fine resolution  (e.g. NIR)
-      factor <- res_sup[1] / res_inf[1]  # degradation factor
-      raster[[num_bands]]<- aggregate(raster[[num_bands]], fact = factor, fun = mean)
+      factor <- res(raster[[1]])[1] / res(raster[[num_bands]])[1]
+      raster[[num_bands]] <- aggregate(raster[[num_bands]], fact = factor, fun = mean)
     }
     
-    # Harmonize dimensions
-    dim_first <- c(nrow(raster[[1]]), ncol(raster[[1]]))  # Dimensions of the first raster band
-    dim_last <- c(nrow(raster[[num_bands]]), ncol(raster[[num_bands]]))  # Dimensions of the last raster band
-    
-    if (dim_first[1] != dim_last[1]) {  # If the number of rows is not equal
-      last_ma <- as.matrix(raster[[num_bands]])  # Convert the last band to a matrix
-      last_ma <- last_ma[-(dim_last[1]), ]  # Remove the last row
-      empty <- rast(raster[[1]])  # Create an empty raster using the first band as a template
-      raster[[num_bands]] <- rast(last_ma, xmn=0, xmx=dim_first[2], ymn=0, ymx=dim_first[1], template=empty)  # Recreate the last band with adjusted dimensions
-    }
-    
-    if (dim_first[2] != dim_last[2]) {  # If the number of columns is not equal
-      last_ma <- as.matrix(raster[[num_bands]])  # Convert the last band to a matrix
-      last_ma <- last_ma[, -(dim_last[2])]  # Remove the last column
-      empty <- rast(raster[[1]])  # Create an empty raster using the first band as a template
-      raster[[num_bands]] <- rast(last_ma, xmn=0, xmx=dim_first[2], ymn=0, ymx=dim_first[1], template=empty)  # Recreate the last band with adjusted dimensions
-    }
-    
-    
-    
-    # Mask each spectral band individually
-    masked_bands <- list() # Initialize an empty list to hold masked bands
+    # Mask each band individually and save
     for (i in 1:num_bands) {
-      path_band <- paste(archipelago, "_", island, "_", nameSat, "_", year, "_", month, "_", resolution, "_band",i,"_cut.TIF", sep = "")
-      masked_band <- mask(raster[[i]], vector_mask, filename = path_band, overwrite = TRUE)
-      masked_bands[[i]] <- masked_band 
+      path_band <- file.path(save_path, paste0(archipelago, "_", island, "_", nameSat, "_", year, "_", month, "_", resolution, "_band", i, "_cut.TIF"))
+      mask(raster[[i]], vector_mask, filename = path_band, overwrite = TRUE)
     }
-    return(masked_band)
     
   } else {
-    
-    # For slope or DTM, mask the raster and save the result
-    path_raster <- paste(archipelago, "_", island, "_", nameSat, "_", year, "_", resolution, "_", raster_type, "_cut.TIF")
-    raster_mask <- mask(raster, vector_mask, filename = path_raster, overwrite = TRUE)
-    return(raster_mask)
+    # For slope or DTM
+    path_raster <- file.path(save_path, paste0(archipelago, "_", island, "_", nameSat, "_", year, "_", resolution, "_", raster_type, "_cut.TIF"))
+    mask(raster, vector_mask, filename = path_raster, overwrite = TRUE)
   }
 }
 
@@ -99,19 +71,18 @@ Raster_Masking <- function(archipelago, island, vector_mask, raster, nameSat, ye
 District='CRO' # 3-letter code for archipelago (e.g. Crozet)
 Island='POS'   # 3-letter code for island (e.g. Possession)
 Satellite1="Pleiades" # satellite name of multispectral imagery
-Year1="2022"    # acquisition year of multispectral imagery
-Month1="02" # acquisition month of multispectral imagery
 Res1 = "50cm"  # spatial resolution of multispectral imagery
 Satellite2='SRTM'  # satellite name of DEM
 Year2="2012"  # acquisition year of DEM
 Res2="30m" # spatial resolution of DEM
 
 
+
 # Set working directory -------------------------------------------------------------
 
-# Base local path (customize to your local environment)
-localHOME=paste0("/home/genouest/cnrs_umr6553/despel/CARTOVEGE/")
-#localHOME = paste0("your_local_path/")
+# Define local root directory
+localHOME = paste0("D:/")
+#localHOME=paste0("/home/genouest/cnrs_umr6553/despel/CARTOVEGE_2/")
 
 # path where to open vector data
 open_mask_path=paste0(localHOME,"data/vector/mask")
@@ -125,17 +96,13 @@ save_cut_raster_path=paste0(localHOME,"data/raster/Cut_image")
 
 # Load rasters and mask  ----------------------------------------------------------
 
-
-print(paste0("Processing imagery for year: ", Year1))
-print(paste0("Processing imagery for month: ", Month1))
+all_years <- c("2025","2024","2023","2022","2021","2020","2015","2011")
+all_months <- c("01","02","03","04","05","06","07","08","09","10","11","12")
 
 # Load ROI polygon shapefile
 print("Loading island ROI shapefile")
-ROI_mask <- st_read(dsn = paste0(open_mask_path, "/", District, "_", Island, "_POLY_", Year1, "_EPSG32739.shp"))
-
-# Load raster data
-print("Loading MS raster")
-raster_MS <- rast(paste0(open_precut_raster_path, "/", District, "_", Island, "_", Satellite1, "_", Year1, "_", Month1, "_", Res1, "_PMS_precut.tif"))
+ROI_mask <- st_read(dsn = paste0(open_mask_path, "/", District, "_", Island, "_POLY_", Year1, "_EPSG32743.shp"))
+ROI_mask<- vect(ROI_mask) # convert to SpatVector
 
 print("Loading slope raster")
 raster_slope <- rast(paste0(open_precut_raster_path, "/", District, "_", Island, "_", Satellite2, "_", Year2, "_", Res2, "_slope_precut.tif"))
@@ -143,19 +110,38 @@ raster_slope <- rast(paste0(open_precut_raster_path, "/", District, "_", Island,
 print("Loading DTM raster")
 raster_DTM <- rast(paste0(open_precut_raster_path, "/", District, "_", Island, "_", Satellite2, "_", Year2, "_", Res2, "_dtm_precut.tif"))
 
-# Apply IslandMasking functions ----------------------------------------------------------
+# Apply RasterMasking functions on MS rasters ----------------------------------------------------------
 
-setwd(save_cut_raster_path)
-getwd()
+for (Year1 in all_years) {
+  
+  print(paste0("Year: ", Year1))
+  
+  for (Month1 in all_months) {
+    print(paste0("Month: ", Month1))
+    
+    raster_path <- file.path(open_precut_raster_path, paste0(District, "_", Island, "_", Satellite1, "_", Year1, "_", Month1, "_", Res1, "_PMS_precut.tif"))
+    
+    if (file.exists(raster_path)) {
+      
+      print("Loading MS raster")
+      raster_MS <- rast(raster_path)
+      
+      print("Masking MS raster using ROI polygon")
+      Raster_Masking(archipelago = District, island = Island, vector_mask = ROI_mask, raster = raster_MS, nameSat = Satellite1, year = Year1, month = Month1, resolution = Res1, raster_type = "PMS",save_path = save_cut_raster_path)
+    } else {
+      message("Raster not found for Year ", Year1, " Month ", Month1, " -> skipping.")
+    }
+  }
+}
 
-# Mask MS raster
-print("Masking MS raster using ROI polygon")
-Raster_Masking(archipelago = District, island = Island, vector_mask = ROI_mask, raster = raster_MS, nameSat = Satellite1, year = Year1, month = Month1, resolution = Res1, raster_type = "PMS")
+
+
+# Apply RasterMasking functions on DEM rasters ----------------------------------------------------------
 
 # Mask slope raster
 print("Masking slope raster using ROI polygon")
-Raster_Masking(archipelago = District, island = Island, vector_mask = ROI_mask, raster = raster_slope, nameSat = Satellite2, year = Year2, resolution = Res2, raster_type = "slope")
+Raster_Masking(archipelago = District, island = Island, vector_mask = ROI_mask, raster = raster_slope, nameSat = Satellite2, year = Year2, resolution = Res2, raster_type = "slope",save_path = save_cut_raster_path)
 
 # Mask DTM raster
 print("Masking DTM raster using ROI polygon")
-Raster_Masking(archipelago = District, island = Island, vector_mask = ROI_mask, raster = raster_DTM, nameSat = Satellite2, year = Year2, resolution = Res2, raster_type = "dtm")
+Raster_Masking(archipelago = District, island = Island, vector_mask = ROI_mask, raster = raster_DTM, nameSat = Satellite2, year = Year2, resolution = Res2, raster_type = "dtm",save_path = save_cut_raster_path)
