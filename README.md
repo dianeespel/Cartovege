@@ -40,10 +40,10 @@ cd Cartovege
 ```
 
 Set up your environment:
-The _requirements/_ folder contains the .yml files for the different environments used in the project.
+The _Requirements/_ folder contains the .yml files for the different environments used in the project.
 Choose the one that fits your needs and create the environment using conda:
 ```
-conda env create -f requirements/environment_name.yml
+conda env create -f Requirements/environment_name.yml
 conda activate environment_name
 ```
 
@@ -58,6 +58,8 @@ Before each script edit the file to specify input and output paths
 
 3) Run the pipeline:
 Execute the main script from the terminal:
+```
+```
 
 
 📂 Project structure
