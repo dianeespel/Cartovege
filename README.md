@@ -59,7 +59,9 @@ Before each script edit the file to specify input and output paths
 3) Run the pipeline:
 Execute the main script from the terminal:
 ```
+Rscript R_scripts/Cartovege_main_script.R
 ```
+
 
 
 📂 Project structure
