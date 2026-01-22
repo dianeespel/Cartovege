@@ -24,13 +24,17 @@ library(ggplot2)       # For plotting
 District='CRO' # 3-letter code for archipelago (e.g. Crozet)
 Island='POS'   # 3-letter code for island (e.g. Possession)
 Satellite1="Pleiades" # satellite name of multispectral imagery
-Year1="2022"    # acquisition year of multispectral imagery
+YearRef="2022" # acquisition year of multispectral imagery
+MonthRef="02" # acquisition month of multispectral imagery
+ResRef = "50cm"  # spatial resolution of multispectral imagery
 maxTypoLevel=4  # Define maximum typology level
 
 # Set working directory -------------------------------------------------------------
 
 # Base local path (customize to your local environment)
 localscratch=paste0("/scratch/despel/CARTOVEGE/")
+localscratch="G:/CARTOVEGE_2/"
+
 #localscratch = paste0("your_local_path/")
 
 # Path to open input learning data
@@ -42,16 +46,15 @@ save_learning_primary_path=paste0(localscratch,"data/Learning_data/PrimaryTypo")
 
 # Load learning data  -------------------------------------------------------------
 
-FILE1 <- paste0(open_learning_primary_path, "/Selected_learning_plots_", District, "_", Island,"_",Satellite1,"_",Year1,"_ALL_SOURCES_EPSG32739.csv")
+FILE1 <- paste0(open_learning_primary_path, "/Learning_plots_", District, "_", Island,"_",Satellite1,"_",YearRef,"_",MonthRef,"_",ResRef,"_ALL_SOURCES_EPSG32739.csv")
 learning_data=read.csv(FILE1, sep=";",dec=".",stringsAsFactors=FALSE) # `stringsAsFactors=F` ensures character strings don't import as factors
 
 # Analyze distribution of each predictor value across habitat levels -------------------------------------------------------------
 
 # Normalize spectral/topographic variables (between 0 and 1)
-ihab=which(colnames(learning_data)==paste0("Hab_L",l))
 ihab4=which(colnames(learning_data)=="Hab_L4")
 learning_normalized <- learning_data%>%
-  mutate(across((ihab4 + 1):(ncol(learning_data)), ~ (.-min(.))/(max(.)-min(.))))
+  mutate(across((ihab4 + 1):(ncol(learning_data)-1), ~ (.-min(.))/(max(.)-min(.))))
 
 # Loop through each habitat classification level
 for (l in seq (1:maxTypoLevel)){
@@ -64,7 +67,7 @@ for (l in seq (1:maxTypoLevel)){
 
   
   # Get list of variable names to analyze
-  variable_list <- colnames(learning_normalized)[(ihab4 + 1):ncol(learning_normalized)]
+  variable_list <- colnames(learning_normalized)[(ihab4 + 1):(ncol(learning_normalized)-1)]
   
   # Loop through each variable
   for (v in variable_list){
@@ -94,7 +97,7 @@ for (l in seq (1:maxTypoLevel)){
       mutate(Variable = v)
     
     # Save summary statistics
-    FILE2=paste0(LevelFolder,"/","Variable_distribution_",District,"_",Island,"_",Satellite1,"_",Year1,"_",v,"_L",l,"_ALL_SOURCES.csv")
+    FILE2=paste0(LevelFolder,"/","Variable_distribution_",District,"_",Island,"_",Satellite1,"_",YearRef,"_",MonthRef,"_","_",v,"_L",l,"_ALL_SOURCES.csv")
     write.table(summary_stats,FILE2,sep = ";", dec = ".", row.names = FALSE)
     
     # Generate violin plot for current variable -------------------------------------------------------
@@ -115,7 +118,7 @@ for (l in seq (1:maxTypoLevel)){
     xlim <- xlim_values[v] %>% coalesce(default_xlim)
     
     # Violin plots with png format
-    NOMpng=paste0(LevelFolder,"/","Variable_distribution_",District,"_",Island,"_",Satellite1,"_",Year1,"_",v,"_L",l,"_ALL_SOURCES.png")
+    NOMpng=paste0(LevelFolder,"/","Variable_distribution_",District,"_",Island,"_",Satellite1,"_",YearRef,"_",MonthRef,"_","_",v,"_L",l,"_ALL_SOURCES.png")
     png(file = NOMpng, width = 1000, height = 600)
     p <- ggplot(learning_normalized, aes_string(x = paste0("Hab_L", l), y = v)) +
       geom_violin(aes_string(fill = paste0("Hab_L", l), color = paste0("Hab_L", l)), position = position_dodge(), draw_quantiles = c(0), show.legend = TRUE) +
@@ -142,7 +145,7 @@ for (l in seq (1:maxTypoLevel)){
     
     
     # Violin plots with svg format
-    NOMsvg=paste0(LevelFolder,"/","Variable_distribution_",District,"_",Island,"_",Satellite1,"_",Year1,"_",v,"_L",l,"_ALL_SOURCES.svg")
+    NOMsvg=paste0(LevelFolder,"/","Variable_distribution_",District,"_",Island,"_",Satellite1,"_",YearRef,"_",MonthRef,"_","_",v,"_L",l,"_ALL_SOURCES.svg")
     svg(file = NOMsvg)
     print(p)
     dev.off()
@@ -151,6 +154,5 @@ for (l in seq (1:maxTypoLevel)){
     
   } # End of variable loop
 
-
-  
-} # End of classification level loop
+} 
+# End of classification level loop

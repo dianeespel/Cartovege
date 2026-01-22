@@ -27,7 +27,9 @@ library(stats)      # For statistical functions such as clustering, distance cal
 District='CRO' # 3-letter code for archipelago (e.g. Crozet)
 Island='POS'   # 3-letter code for island (e.g. Possession)
 Satellite1="Pleiades" # satellite name of multispectral imagery
-Year1="2022"    # acquisition year of multispectral imagery
+YearRef="2022" # acquisition year of multispectral imagery
+MonthRef="02" # acquisition month of multispectral imagery
+ResRef = "50cm"  # spatial resolution of multispectral imagery
 maxTypoLevel=4  # Define maximum typology level
 
 # Set working directory -------------------------------------------------------------
@@ -46,8 +48,8 @@ save_learning_primary_path=paste0(localscratch,"data/Learning_data/PrimaryTypo")
 
 # Load learning data  -------------------------------------------------------------
 
-FILE1=paste0(open_learning_primary_path,"/","Selected_learning_plots_", District, "_", Island,"_",Satellite1,"_",Year1,"_ALL_SOURCES_EPSG32739.csv")
-learning_data <- read.csv(FILE1, sep=";",dec=".",stringsAsFactors=FALSE) # `stringsAsFactors=F` ensures character strings don't import as factors
+FILE1 <- paste0(open_learning_primary_path, "/Learning_plots_", District, "_", Island,"_",Satellite1,"_",YearRef,"_",MonthRef,"_",ResRef,"_ALL_SOURCES_EPSG32739.csv")
+learning_data=read.csv(FILE1, sep=";",dec=".",stringsAsFactors=FALSE) # `stringsAsFactors=F` ensures character strings don't import as factors
 
 
 # Perform Hierarchical Clustering of habitat classes for each typology level ---------------------------------------------
@@ -64,7 +66,7 @@ for (l in seq(1:maxTypoLevel)){
   
   
   # Define columns to remove before analysis (ID and spatial coordinates)
-  variables_to_remove <- c("ID", "xcoord_m", "ycoord_m")
+  variables_to_remove <- c("ID", "xcoord_m", "ycoord_m","Longitude","Latitude","Date","Source","Surface","geometry")
   print(variables_to_remove)
 
   # Remove unwanted columns from the dataset
@@ -96,26 +98,26 @@ for (l in seq(1:maxTypoLevel)){
   
   
   # Plot dendrogram (means)
-  png(filename = paste0(LevelFolder, "/Means_HC_", District, "_", Island, "_", Satellite1, "_level_", l, ".png"))
+  png(filename = paste0(LevelFolder, "/Means_HC_", District, "_", Island, "_", Satellite1,"_",YearRef,"_",MonthRef,"_",ResRef, "_L", l, "_ALL_SOURCES.png"))
   dendro_plot_means <- fviz_dend(hc_means, cex = 0.5, k = k_clusters, color_labels_by_k = TRUE, rect = TRUE) +
     labs(title = paste("Dendrogram of Means - Level", l))
   print(dendro_plot_means)
   dev.off()
   
-  NOMsvg=paste0(LevelFolder,"/","Means_HC_", District, "_", Island, "_", Satellite1, "_level_", l, ".svg")
+  NOMsvg=paste0(LevelFolder,"/","Means_HC_", District, "_", Island, "_", Satellite1,"_",YearRef,"_",MonthRef,"_",ResRef, "_L", l, "_ALL_SOURCES.svg")
   svg(file = NOMsvg)
   print(dendro_plot_means)
   dev.off()
   
   
   # Plot dendrogram (medians)
-  png(filename = paste0(LevelFolder , "/Medians_HC_", District, "_", Island, "_", Satellite1, "_level_", l, ".png"))
+  png(filename = paste0(LevelFolder , "/Medians_HC_", District, "_", Island, "_", Satellite1,"_",YearRef,"_",MonthRef,"_",ResRef, "_L", l, "_ALL_SOURCES.png"))
   dendro_plot_medians <- fviz_dend(hc_medians, cex = 0.5, k =k_clusters, color_labels_by_k = TRUE, rect = TRUE) +
     labs(title = paste("Dendrogram of Medians - Level", l))
   print(dendro_plot_medians)
   dev.off()
   
-  NOMsvg=paste0(LevelFolder,"/","Medians_HC_", District, "_", Island, "_", Satellite1, "_level_", l, ".svg")
+  NOMsvg=paste0(LevelFolder,"/","Medians_HC_", District, "_", Island, "_", Satellite1,"_",YearRef,"_",MonthRef,"_",ResRef, "_L", l, "_ALL_SOURCES.svg")
   svg(file = NOMsvg)
   print(dendro_plot_medians)
   dev.off()

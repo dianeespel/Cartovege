@@ -33,6 +33,7 @@ Res1 = "50cm"  # spatial resolution of multispectral imagery
 
 # Create functions -------------------------------------------------------
 
+
 # Function to compute and export several spectral indices from MS bands
 SpectralIndices<- function(archipelago,island,red,green,blue,nir,nameSat,year,month,resImage,save_path){
   
@@ -72,11 +73,12 @@ SpectralIndices<- function(archipelago,island,red,green,blue,nir,nameSat,year,mo
   
 }
 
+
 # Set working directory -------------------------------------------------------------
 
-# Base local path (customize to your local environment)
-#localHOME = paste0("your_local_path/")
-localHOME=paste0("/home/genouest/cnrs_umr6553/despel/CARTOVEGE/")
+# Define local root directory
+localHOME = paste0("D:/")
+#localHOME=paste0("/home/genouest/cnrs_umr6553/despel/CARTOVEGE_2/")
 
 # Path to open  input MS raster data
 open_cut_raster_path=paste0(localHOME ,"data/raster/Cut_image")
@@ -88,7 +90,7 @@ save_cut_raster_path=paste0(localHOME,"data/raster/Cut_image")
 # Run SpectralIndices() for each available year and month----------------------------------------------------------
 
 # List of years and months
-all_years <- c("2025","2024","2023","2022","2021","2020","2015","2011")
+all_years <- c("2011","2015","2020","2021","2022","2023","2024","2025")
 all_months <- c("01","02","03","04","05","06","07","08","09","10","11","12")
 
 # Run the loop on available rasters
@@ -111,7 +113,13 @@ for (Year1 in all_years) {
       message(" One or more band files missing for ", Year1, "-", Month1, " -> skipping.")
       next
     }
-    
+    if (exists("R") || exists("G") || exists("B") || exists("NIR")) {
+      stop(
+        "Stale raster objects detected before loading data for ",
+        Year1, "-", Month1,
+        ". Aborting to avoid wrong temporal attribution."
+      )
+    }
     
     # Load rasters
     B <- rast(raster_path_blue)
@@ -125,6 +133,10 @@ for (Year1 in all_years) {
     
   } # end of month
 } # end of year
+
+
+
+
 
 
 
