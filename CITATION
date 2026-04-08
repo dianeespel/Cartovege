@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+title: "CARTOVEGE - R scripts for vegetation mapping"
+message: "If you use this code, please cite it as below."
+type: software
+authors:
+
+* family-names: ESPEL
+  given-names: Diane
+  project: CARTOVEGE
+  year: 2026
+  license: MIT
