@@ -73,6 +73,7 @@ Cartovege/
 ├── R_scripts/           # Processing and analysis scripts
 ├── Rmarkdown_tutorials/ # R markdown files
 ├── LICENCE.txt          # MIT Licence file
+├── CITATION.ccf         # CITATION file
 └── README.md            # Project documentation
 ```
 
