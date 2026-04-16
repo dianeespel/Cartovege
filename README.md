@@ -22,12 +22,13 @@ It uses a **Random Forest** supervised classification framework and supports hie
 - Transparent script-based implementation (no GUI required)
 - RMarkdown tutorials
 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+📄 Licence & Citation
 
 This pipeline is open source but protected by a MIT Licence. 
 
 Please cite this pipeline using the following DOI: https://doi.org/10.5281/zenodo.15827741
-
-Contact:  dianeespel 
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -79,6 +80,12 @@ Cartovege/
 └── README.md            # Project documentation
 ```
 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+👤 Authors / contact
+
+Diane ESPEL, PhD
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 
